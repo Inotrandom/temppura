@@ -12,50 +12,47 @@
 class compiler_t
 {
 public:
-    void abort()
-    {
-        m_running = false;
-        std::cout << "Compilation aborted." << std::endl;
-    }
+	void abort()
+	{
+		m_running = false;
+		std::cout << "Compilation aborted." << std::endl;
+	}
 
-    auto compile(std::string script) -> std::string;
+	auto compile(std::string script) -> std::string;
 
-    void build_project(std::string parent_dir);
+	void build_project(std::string parent_dir);
 
-    void err(const std::string what, std::uint64_t line_n = 0)
-    {
-        std::cout << "\033[31m[error] A critical compiler error has occurred" << std::endl;
-        std::cout << "\t" << what << std::endl << "\033[0m";
+	void err(const std::string what, std::uint64_t line_n = 0)
+	{
+		std::cout << "\033[31m[error] A critical compiler error has occurred" << std::endl;
+		std::cout << "\t" << what << std::endl << "\033[0m";
 
-        if (line_n > 0)
-        {
-            std::cout << "Traceback to line " << line_n << std::endl;
-        }
+		if (line_n > 0)
+		{
+			std::cout << "Traceback to line " << line_n << std::endl;
+		}
 
-        m_running = false;
-    }
+		m_running = false;
+	}
 
-    void handle_token(std::vector<std::string> &tokens, TOKEN id, std::string &res, std::uint64_t line_n);
+	void handle_token(std::vector<std::string> &tokens, TOKEN id, std::string &res, std::uint64_t line_n);
 
-    void func_define(std::vector<std::string> tokens, std::string &res, std::uint64_t line_n);
+	void func_define(std::vector<std::string> tokens, std::string &res, std::uint64_t line_n);
 
-    void sort_aliases_length();
+	void sort_aliases_length();
 
-    void fill_aliases(std::string &res);
+	void fill_aliases(std::string &res);
 
-    void clear_cache()
-    {
-        m_aliases.clear();
-    }
+	void clear_cache() { m_aliases.clear(); }
 
 private:
-    void compile_project();
+	void compile_project();
 
-    void clean_project();
+	void clean_project();
 
-    bool m_running;
+	bool m_running;
 
-    std::vector<alias_t> m_aliases;
+	std::vector<alias_t> m_aliases;
 };
 
 #endif

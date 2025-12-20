@@ -9,33 +9,35 @@
 
 /**
  * Reads the contents of a file.
- * 
+ *
  * @param path The relative path from the CWD
- * 
+ *
  * @return std::nullopt if the file failed to read, or std::string
  * if it was successful
  */
-inline auto file_read(const std::string& path) -> std::optional<std::string>
+inline auto file_read(const std::string &path) -> std::optional<std::string>
 {
-    std::ifstream file(path);
-    
-    if (file.is_open() == false) return std::nullopt;
+	std::ifstream file(path);
 
-    std::stringstream buf;
-    buf << file.rdbuf();
+	if (file.is_open() == false)
+		return std::nullopt;
 
-    return buf.str();
+	std::stringstream buf;
+	buf << file.rdbuf();
+
+	return buf.str();
 }
 
 inline auto file_write(const std::string &path, const std::string &contents) -> std::int8_t
 {
-    std::ofstream file = std::ofstream(path);
+	std::ofstream file = std::ofstream(path);
 
-    if (file.is_open() == false) return 1;
+	if (file.is_open() == false)
+		return 1;
 
-    file << contents;
+	file << contents;
 
-    return 0;
+	return 0;
 }
 
 #endif // H_FILE_UTILS

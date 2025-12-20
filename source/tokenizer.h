@@ -8,29 +8,28 @@
 
 enum TOKEN
 {
-    NONEXISTENT,
-    DEFINE
+	NONEXISTENT,
+	DEFINE
 };
 
-const std::map<std::string, TOKEN> tokenizer =
-{
-    {"define", TOKEN::DEFINE},
+const std::map<std::string, TOKEN> tokenizer = {
+	{"define", TOKEN::DEFINE},
 };
 
 inline auto tokenize(const std::string what) -> TOKEN
 {
-    TOKEN res = TOKEN::NONEXISTENT;
+	TOKEN res = TOKEN::NONEXISTENT;
 
-    try
-    {
-        res = tokenizer.at(what);
-    }
-    catch (std::out_of_range &e)
-    {
-        return TOKEN::NONEXISTENT;
-    }
+	try
+	{
+		res = tokenizer.at(what);
+	}
+	catch (std::out_of_range &e)
+	{
+		return TOKEN::NONEXISTENT;
+	}
 
-    return res;
+	return res;
 }
 
 #endif

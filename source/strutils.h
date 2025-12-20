@@ -7,67 +7,67 @@
 
 /**
  * Splits a string into multiple substrings, separated by a delimiter.
- * 
+ *
  * @param s The input string to be operated over
  * @param delimiter A delimiter to determine how tokens are separated
- * 
+ *
  * @returns A vector of substrings after having been separated by delimiter.
  */
-inline auto string_split(std::string s, const std::string& delimiter) -> std::vector<std::string> 
+inline auto string_split(std::string s, const std::string &delimiter) -> std::vector<std::string>
 {
-    std::vector<std::string> tokens;
-    std::size_t pos = 0;
-    std::string token;
+	std::vector<std::string> tokens;
+	std::size_t pos = 0;
+	std::string token;
 
-    while ((pos = s.find(delimiter)) != std::string::npos) 
-    {
-        token = s.substr(0, pos);
-        tokens.push_back(token);
-        s.erase(0, (pos + delimiter.length()));
-    }
-    tokens.push_back(s);
+	while ((pos = s.find(delimiter)) != std::string::npos)
+	{
+		token = s.substr(0, pos);
+		tokens.push_back(token);
+		s.erase(0, (pos + delimiter.length()));
+	}
+	tokens.push_back(s);
 
-    return tokens;
+	return tokens;
 }
 
 inline auto last_in_path(std::string s) -> std::string
 {
-    std::vector<std::string> tokens = string_split(s, "/");
-    return tokens.back();
+	std::vector<std::string> tokens = string_split(s, "/");
+	return tokens.back();
 }
 
 /**
  * Finds all occurances and replaces them in a string.
- * 
+ *
  * @param s The string to be operated over
- * 
+ *
  * @param what The string to match occurences in `s`
- * 
+ *
  * @param with The string to replace `what` with
  */
-inline void string_replace(std::string& s, std::string what, const std::string with) 
+inline void string_replace(std::string &s, std::string what, const std::string with)
 {
-    std::size_t pos = 0;
+	std::size_t pos = 0;
 
-    while ((pos = s.find(what)) != std::string::npos) 
-    {
-        s.replace(pos, what.size(), with);
-    }
+	while ((pos = s.find(what)) != std::string::npos)
+	{
+		s.replace(pos, what.size(), with);
+	}
 }
 
 inline auto vector_collect(std::vector<std::string> &v, const std::string delim = "") -> std::string
 {
-    std::stringstream res;
+	std::stringstream res;
 
-    for (auto s : v)
-    {
-        res << s << delim;
-    }
+	for (auto s : v)
+	{
+		res << s << delim;
+	}
 
-    std::string s_res = res.str();
-    std::string without_trailing = s_res.substr(0, (s_res.size() - delim.size()));
+	std::string s_res = res.str();
+	std::string without_trailing = s_res.substr(0, (s_res.size() - delim.size()));
 
-    return without_trailing;
+	return without_trailing;
 }
 
 #endif // H_STR_UTILS

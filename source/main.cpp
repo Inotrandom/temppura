@@ -7,57 +7,58 @@
 
 static void console_clear()
 {
-    #if defined _WIN32
-        system("cls");
-    #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__)
-        system("clear"); 
-    #elif defined (__APPLE__)
-        system("clear");
-    #endif
+#if defined _WIN32
+	system("cls");
+#elif defined(__LINUX__) || defined(__gnu_linux__) || defined(__linux__)
+	system("clear");
+#elif defined(__APPLE__)
+	system("clear");
+#endif
 }
 
 auto main(int argv, char **argc) -> int
 {
-    bool m_running = true;
+	bool m_running = true;
 
-    compiler_t compiler = compiler_t();
+	compiler_t compiler = compiler_t();
 
-    console_clear();
+	console_clear();
 
-    while (m_running)
-    {
-        std::cout << std::filesystem::current_path() << " dp-helper >";
+	while (m_running)
+	{
+		std::cout << std::filesystem::current_path() << " dp-helper >";
 
-        std::string buf;
-        std::getline(std::cin, buf);
+		std::string buf;
+		std::getline(std::cin, buf);
 
-        if (buf == "exit")
-        {
-            console_clear();
-            return 0;
-        }
+		if (buf == "exit")
+		{
+			console_clear();
+			return 0;
+		}
 
-        if (buf == "cd")
-        {
-            std::getline(std::cin, buf);
+		if (buf == "cd")
+		{
+			std::getline(std::cin, buf);
 
-            // Incredibly lazy
-            if (std::filesystem::exists(buf) == false) continue;
-            std::filesystem::current_path(buf);
+			// Incredibly lazy
+			if (std::filesystem::exists(buf) == false)
+				continue;
+			std::filesystem::current_path(buf);
 
-            continue;
-        }
+			continue;
+		}
 
-        if (buf == "clear")
-        {
-            console_clear();
+		if (buf == "clear")
+		{
+			console_clear();
 
-            continue;
-        }
+			continue;
+		}
 
-        compiler.clear_cache();
-        compiler.build_project(buf);
-    }
+		compiler.clear_cache();
+		compiler.build_project(buf);
+	}
 
-    return 0;
+	return 0;
 }
