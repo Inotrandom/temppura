@@ -16,7 +16,8 @@
 #include "fileutils.h"
 #include "utils.h"
 
-const std::string SIGNATURE = "# File compiled on $T (Datapack Helper)\n\n";
+const std::string SIGNATURE = "$COMMENT File compiled on $T $ENDCOMMENT\n\n$COMMENT Temppura: https://github.com/Inotrandom/temppura $ENDCOMMENT \n$COMMENT "
+							  "12/20/2025 (MIT License) $ENDCOMMENT";
 
 auto compiler_t::compile(std::string script) -> std::string
 {
@@ -69,6 +70,8 @@ auto compiler_t::compile(std::string script) -> std::string
 	std::string time_and_zone = (time);
 
 	string_replace(signature, "$T", time_and_zone);
+	string_replace(signature, "$ENDCOMMENT", m_config.end_comment);
+	string_replace(signature, "$COMMENT", m_config.begin_comment);
 
 	res = signature + res;
 
@@ -91,6 +94,22 @@ void compiler_t::handle_token(std::vector<std::string> &tokens, TOKEN id, std::s
 	{
 		func_define(tokens, res, line_n);
 	}
+
+	case (TOKEN::FLAG):
+	{
+	}
+	}
+}
+
+const std::uint8_t MIN_FLAG_ARGS = 1;
+const std::uint8_t MAX_FLAG_ARGS = 1;
+
+void compiler_t::func_flag(std::vector<std::string> tokens, std::string &res, std::uint64_t line_n)
+{
+	if (tokens.size() < MIN_FLAG_ARGS || tokens.size() > MAX_FLAG_ARGS)
+	{
+		err("Incorrect arguments to flag directive", line_n);
+		return;
 	}
 }
 
@@ -187,12 +206,13 @@ void compiler_t::compile_project()
 		stream_name << dir_entry;
 		std::string name = stream_name.str();
 
-		if (name.find(FILE_NAME::EXTENSION) == std::string::npos)
+		// Ignore non-temppura files
+		if (in_str(name, FILE_NAME::EXTENSION) == false)
 		{
 			continue;
 		}
 
-		std::string trimmed_name = name.substr(1, name.size() - 2);
+		std::string trimmed_name = trim_first_and_last(name);
 
 		std::cout << "[info] Building file " << trimmed_name << std::endl;
 
@@ -203,9 +223,16 @@ void compiler_t::compile_project()
 
 		std::string filename = last_in_path(trimmed_name);
 
-		std::string renamed_filename = filename.substr(0, filename.size() - FILE_NAME::EXTENSION.size());
+		std::string renamed_filename = trim_suffix(filename, FILE_NAME::EXTENSION);
 
-		renamed_filename += FILE_NAME::MCFUNCTION;
+		// Output file extension
+		std::string output_fextension = m_config.default_fextension;
+		if (has_flag(FLAG_TYPE::OUTPUT_FILE_EXTENSION) == true)
+		{
+			output_fextension = m_flags.at(FLAG_TYPE::OUTPUT_FILE_EXTENSION);
+		}
+
+		renamed_filename += m_config.default_fextension;
 
 		std::string compile_path = vector_collect(compile_path_tokens, ddelim());
 

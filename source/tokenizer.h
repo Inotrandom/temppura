@@ -9,12 +9,16 @@
 enum TOKEN
 {
 	NONEXISTENT,
-	DEFINE
+	DEFINE,
+	FLAG
 };
 
+// clang-format off
 const std::map<std::string, TOKEN> tokenizer = {
-	{"define", TOKEN::DEFINE},
+	{LEXICON::DEFINE, TOKEN::DEFINE},
+    {LEXICON::FLAG, TOKEN::FLAG}
 };
+// clang-format on
 
 inline auto tokenize(const std::string what) -> TOKEN
 {

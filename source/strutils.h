@@ -70,4 +70,10 @@ inline auto vector_collect(std::vector<std::string> &v, const std::string delim 
 	return without_trailing;
 }
 
+inline auto trim_first_and_last(std::string s) -> std::string { return s.substr(1, s.size() - 2); }
+
+inline auto in_str(const std::string &s, const std::string what) -> bool { return (s.find(what) != std::string::npos); }
+
+inline auto trim_suffix(std::string s, const std::string which) -> std::string { return (s.substr(0, s.size() - which.size())); }
+
 #endif // H_STR_UTILS

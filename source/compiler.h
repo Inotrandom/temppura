@@ -3,6 +3,10 @@
 
 #include <string>
 #include <vector>
+#include <map>
+
+#include "flag.h"
+#include "configuration.h"
 
 #include "lexicon.h"
 #include "tokenizer.h"
@@ -38,12 +42,15 @@ public:
 	void handle_token(std::vector<std::string> &tokens, TOKEN id, std::string &res, std::uint64_t line_n);
 
 	void func_define(std::vector<std::string> tokens, std::string &res, std::uint64_t line_n);
+	void func_flag(std::vector<std::string> tokens, std::string &res, std::uint64_t line_n);
 
 	void sort_aliases_length();
 
 	void fill_aliases(std::string &res);
 
 	void clear_cache() { m_aliases.clear(); }
+
+	auto has_flag(FLAG_TYPE flag) -> bool { return (m_flags.find(flag) != m_flags.end()); }
 
 private:
 	void compile_project();
@@ -53,6 +60,9 @@ private:
 	bool m_running;
 
 	std::vector<alias_t> m_aliases;
+	std::map<FLAG_TYPE, std::string> m_flags;
+
+	configuration_t m_config;
 };
 
 #endif
