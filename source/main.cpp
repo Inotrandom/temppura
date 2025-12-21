@@ -27,7 +27,7 @@ auto main() -> int
 	while (m_running)
 	{
 		std::string path = std::string(std::filesystem::current_path());
-		std::cout << path << " dp-helper >";
+		std::cout << path << " temppura >";
 
 		std::string buf;
 		std::getline(std::cin, buf);
