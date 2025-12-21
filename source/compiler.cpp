@@ -57,7 +57,10 @@ auto compiler_t::compile(std::string script) -> std::string
 
 	std::vector<std::string> lines = string_split(script, LEXICON::DELIM);
 
-	std::uint64_t preproc_id_len = LEXICON::PREPROC.size();
+	std::string preproc = LEXICON::PREPROC;
+	string_replace(preproc, "$BEGINCOMMENT", m_config.begin_comment);
+
+	std::uint64_t preproc_id_len = preproc.size();
 
 	std::uint64_t line_n = 0;
 	for (auto line : lines)
@@ -67,12 +70,23 @@ auto compiler_t::compile(std::string script) -> std::string
 		if (line.size() == 0)
 			continue;
 
-		if (line.substr(0, preproc_id_len) != LEXICON::PREPROC)
+		if (line.substr(0, preproc_id_len) != preproc)
 		{
 			continue;
 		}
 
 		std::vector<std::string> tokens = string_split(line, LEXICON::TOKEN_DELIM);
+
+		if (tokens.size() == 0)
+		{
+			continue;
+		}
+
+		if (tokens[0].length() < preproc_id_len)
+		{
+			continue;
+		}
+
 		std::string shaved_id = tokens[0].substr(preproc_id_len, tokens[0].size());
 
 		TOKEN tokenized_id = tokenize(shaved_id);
@@ -80,7 +94,8 @@ auto compiler_t::compile(std::string script) -> std::string
 		if (tokenized_id == TOKEN::NONEXISTENT)
 		{
 			std::stringstream msg;
-			msg << "Unidentified token on line" << line_n;
+			msg << "Unidentified temppura directive on line " << line_n;
+			msg << "\n\t(" << shaved_id << ")";
 			err(msg.str());
 			continue;
 		}

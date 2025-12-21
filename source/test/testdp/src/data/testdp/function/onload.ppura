@@ -1,5 +1,5 @@
-###define COM say
-###define MSG Hello, world!
-###define DIST 1
+#ppura::define COM say
+#ppura::define MSG Hello, world!
+#ppura::define DIST 1
 
 execute as @a[gamemode=creative] at @s if entity @n[distance=$DIST] run $COM $MSG
