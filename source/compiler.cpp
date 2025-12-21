@@ -35,6 +35,7 @@ void compiler_t::load_config()
 		std::stringstream msg;
 		msg << "No \"" << FILE_NAME::CONFIG << "\" file found in \"" << DIR::SOURCE << "\" directory.";
 		err(msg.str());
+		return;
 	}
 
 	std::string opened_contents = contents.value();
