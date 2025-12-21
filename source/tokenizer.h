@@ -3,10 +3,11 @@
 
 #include <map>
 #include <string>
+#include <cstdint>
 
 #include "lexicon.h"
 
-enum TOKEN
+enum class TOKEN : uint8_t
 {
 	NONEXISTENT,
 	DEFINE,
@@ -36,4 +37,4 @@ inline auto tokenize(const std::string what) -> TOKEN
 	return res;
 }
 
-#endif
+#endif // H_TOKENIZER

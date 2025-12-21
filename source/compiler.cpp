@@ -17,7 +17,38 @@
 #include "utils.h"
 
 const std::string SIGNATURE = "$COMMENT File compiled on $T $ENDCOMMENT\n\n$COMMENT Temppura: https://github.com/Inotrandom/temppura $ENDCOMMENT \n$COMMENT "
-							  "12/20/2025 (MIT License) $ENDCOMMENT";
+							  "12/20/2025 (MIT License) $ENDCOMMENT\n";
+
+// clang-format off
+#define FORCE_CONFIG(TEST, VAL) if (m_config.TEST == DEFAULT_STRING_VALUE) { std::stringstream msg; msg << "Configuration failed! " << VAL << " is undefined!"; err(msg.str()); return; }
+// clang-format on
+
+void compiler_t::load_config()
+{
+	std::stringstream path;
+	path << "./" << DIR::SOURCE << "/" << FILE_NAME::CONFIG;
+	std::optional<std::string> contents = file_read(path.str());
+
+	if (contents.has_value() == false)
+	{
+		std::stringstream msg;
+		msg << "No \"" << FILE_NAME::CONFIG << "\" file found in \"" << DIR::SOURCE << "\" directory.";
+		err(msg.str());
+	}
+
+	std::string opened_contents = contents.value();
+
+	m_config.begin_comment = get_pair(opened_contents, CONFIG_LEXICON::BEGIN_COMMENT);
+	FORCE_CONFIG(begin_comment, CONFIG_LEXICON::BEGIN_COMMENT)
+	m_config.begin_comment = trim_first_and_last(m_config.begin_comment);
+
+	m_config.end_comment = get_pair(opened_contents, CONFIG_LEXICON::END_COMMENT);
+	FORCE_CONFIG(end_comment, CONFIG_LEXICON::END_COMMENT)
+	m_config.end_comment = trim_first_and_last(m_config.end_comment);
+
+	m_config.default_fextension = get_pair(opened_contents, CONFIG_LEXICON::DEFAULT_FEXTENSION);
+	m_config.default_fextension = trim_first_and_last(m_config.default_fextension);
+}
 
 auto compiler_t::compile(std::string script) -> std::string
 {
@@ -55,7 +86,7 @@ auto compiler_t::compile(std::string script) -> std::string
 		}
 
 		tokens.erase(tokens.begin()); // Erase the ID
-		handle_token(tokens, tokenized_id, res, line_n);
+		handle_token(tokens, tokenized_id, line_n);
 	}
 
 	fill_aliases(res);
@@ -78,7 +109,7 @@ auto compiler_t::compile(std::string script) -> std::string
 	return res;
 }
 
-void compiler_t::handle_token(std::vector<std::string> &tokens, TOKEN id, std::string &res, std::uint64_t line_n)
+void compiler_t::handle_token(std::vector<std::string> &tokens, TOKEN id, std::uint64_t line_n)
 {
 	// NOTE: The `tokens` parameter does not include an ID... this is passed in as the parameter `id`
 
@@ -92,30 +123,56 @@ void compiler_t::handle_token(std::vector<std::string> &tokens, TOKEN id, std::s
 
 	case (TOKEN::DEFINE):
 	{
-		func_define(tokens, res, line_n);
+		func_define(tokens, line_n);
+		break;
 	}
 
 	case (TOKEN::FLAG):
 	{
+		func_flag(tokens, line_n);
+		break;
 	}
 	}
 }
 
 const std::uint8_t MIN_FLAG_ARGS = 1;
-const std::uint8_t MAX_FLAG_ARGS = 1;
+const std::uint8_t OUTPUT_FILE_EXTENSION_ARGS = 2;
 
-void compiler_t::func_flag(std::vector<std::string> tokens, std::string &res, std::uint64_t line_n)
+void compiler_t::func_flag(std::vector<std::string> tokens, std::uint64_t line_n)
 {
-	if (tokens.size() < MIN_FLAG_ARGS || tokens.size() > MAX_FLAG_ARGS)
+	if (tokens.size() < MIN_FLAG_ARGS)
 	{
 		err("Incorrect arguments to flag directive", line_n);
 		return;
+	}
+
+	FLAG_TYPE tokenized = flag_tokenize(tokens[0]);
+
+	switch (tokenized)
+	{
+	case (FLAG_TYPE::NONEXISTENT):
+	{
+		err("Unrecognized flag directive type", line_n);
+		break;
+	}
+
+	case (FLAG_TYPE::OUTPUT_FILE_EXTENSION):
+	{
+		if (tokens.size() < OUTPUT_FILE_EXTENSION_ARGS)
+		{
+			err("Incorrect arguments to output file extension flag directive", line_n);
+			return;
+		}
+
+		m_flags[FLAG_TYPE::OUTPUT_FILE_EXTENSION] = tokens[1];
+		break;
+	}
 	}
 }
 
 const std::uint8_t MIN_ALIAS_ARGS = 2;
 
-void compiler_t::func_define(std::vector<std::string> tokens, std::string &res, std::uint64_t line_n)
+void compiler_t::func_define(std::vector<std::string> tokens, std::uint64_t line_n)
 {
 	if (tokens.size() < MIN_ALIAS_ARGS)
 	{
@@ -166,11 +223,15 @@ void compiler_t::build_project(std::string parent_dir)
 	std::filesystem::current_path(parent_dir);
 
 	std::cout << "[info] Operating in: " << std::filesystem::current_path() << std::endl << std::endl;
+	load_config();
+
+	if (m_running == false)
+		return;
 
 	if (std::filesystem::exists(DIR::SOURCE) == false)
 	{
 		std::stringstream msg;
-		msg << "Unable to locate source " << "\"" << DIR::SOURCE << "\"" << "directory.";
+		msg << "Unable to locate source " << "\"" << DIR::SOURCE << "\"" << " directory.";
 
 		err(msg.str());
 		return;
@@ -223,7 +284,10 @@ void compiler_t::compile_project()
 
 		std::string filename = last_in_path(trimmed_name);
 
-		std::string renamed_filename = trim_suffix(filename, FILE_NAME::EXTENSION);
+		if (std::filesystem::exists(trimmed_name) == false)
+			continue;
+
+		std::string compiled = compile(file_read(trimmed_name).value());
 
 		// Output file extension
 		std::string output_fextension = m_config.default_fextension;
@@ -232,7 +296,8 @@ void compiler_t::compile_project()
 			output_fextension = m_flags.at(FLAG_TYPE::OUTPUT_FILE_EXTENSION);
 		}
 
-		renamed_filename += m_config.default_fextension;
+		std::string renamed_filename = trim_suffix(filename, FILE_NAME::EXTENSION);
+		renamed_filename += output_fextension;
 
 		std::string compile_path = vector_collect(compile_path_tokens, ddelim());
 
@@ -240,11 +305,6 @@ void compiler_t::compile_project()
 		full_path << compile_path;
 		full_path << ddelim();
 		full_path << renamed_filename;
-
-		if (std::filesystem::exists(trimmed_name) == false)
-			continue;
-
-		std::string compiled = compile(file_read(trimmed_name).value());
 
 		if (m_running == false)
 		{
@@ -254,6 +314,8 @@ void compiler_t::compile_project()
 		std::cout << "[info] Outputting as " << full_path.str() << std::endl;
 
 		file_write(full_path.str(), compiled);
+
+		m_flags.clear();
 	}
 }
 

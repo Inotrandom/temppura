@@ -4,8 +4,9 @@
 #include <map>
 #include <string>
 #include <stdexcept>
+#include <cstdint>
 
-enum FLAG_TYPE
+enum class FLAG_TYPE : uint8_t
 {
 	NONEXISTENT,
 	OUTPUT_FILE_EXTENSION
@@ -33,4 +34,4 @@ inline auto flag_tokenize(const std::string what) -> FLAG_TYPE
 	return res;
 }
 
-#endif
+#endif // H_FLAG

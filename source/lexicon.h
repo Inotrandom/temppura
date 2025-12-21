@@ -23,7 +23,8 @@ const std::string BUILD = "build";
 
 namespace FILE_NAME
 {
-const std::string EXTENSION = ".tpp";
+const std::string EXTENSION = ".ppura";
+const std::string CONFIG = "temppura.cfg";
 } // namespace FILE_NAME
 
-#endif
+#endif // H_LEXICON
