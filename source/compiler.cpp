@@ -17,7 +17,8 @@
 #include "utils.h"
 
 const std::string SIGNATURE = "$COMMENT File compiled on $T $ENDCOMMENT\n\n$COMMENT Temppura: https://github.com/Inotrandom/temppura $ENDCOMMENT \n$COMMENT "
-							  "12/20/2025 (MIT License) $ENDCOMMENT\n";
+							  "12/20/2025 (MIT License) $ENDCOMMENT\n\n$COMMENT THIS FILE IS NOT INTENDED FOR HUMAN MODIFICATION! $ENDCOMMENT\n$COMMENT (it's "
+							  "just less readable...) $ENDCOMMENT\n\n";
 
 // clang-format off
 #define FORCE_CONFIG(TEST, VAL) if (m_config.TEST == DEFAULT_STRING_VALUE) { std::stringstream msg; msg << "Configuration failed! " << VAL << " is undefined!"; err(msg.str()); return; }
@@ -88,6 +89,8 @@ auto compiler_t::compile(std::string script) -> std::string
 		}
 
 		std::string shaved_id = tokens[0].substr(preproc_id_len, tokens[0].size());
+		if (m_config.end_comment != "")
+			string_replace(shaved_id, m_config.end_comment, "");
 
 		TOKEN tokenized_id = tokenize(shaved_id);
 
@@ -127,6 +130,15 @@ auto compiler_t::compile(std::string script) -> std::string
 void compiler_t::handle_token(std::vector<std::string> &tokens, TOKEN id, std::uint64_t line_n)
 {
 	// NOTE: The `tokens` parameter does not include an ID... this is passed in as the parameter `id`
+
+	// Clean tokens
+	for (auto &token : tokens)
+	{
+		if (m_config.end_comment == "")
+			break;
+
+		string_replace(token, m_config.end_comment, "");
+	}
 
 	switch (id)
 	{
