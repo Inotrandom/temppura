@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(Temppura)
+add_compile_options(-Wall -Wpedantic -Wextra)
 
 set(CXX_STANDARD 20)
 
-set(WINDOWS_BUILD TRUE)
+set(WINDOWS_BUILD FALSE)
 
 if (WINDOWS_BUILD)
     add_link_options(-static -static-libgcc -static-libstdc++)

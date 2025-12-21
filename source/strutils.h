@@ -5,6 +5,10 @@
 #include <vector>
 #include <iostream>
 
+#include <algorithm>
+#include <cctype>
+#include <locale>
+
 /**
  * Splits a string into multiple substrings, separated by a delimiter.
  *
@@ -68,6 +72,37 @@ inline auto vector_collect(std::vector<std::string> &v, const std::string delim 
 	std::string without_trailing = s_res.substr(0, (s_res.size() - delim.size()));
 
 	return without_trailing;
+}
+
+inline auto trim_first_and_last(std::string s) -> std::string { return s.substr(1, s.size() - 2); }
+
+inline auto in_str(const std::string &s, const std::string what) -> bool { return (s.find(what) != std::string::npos); }
+
+inline auto trim_suffix(std::string s, const std::string which) -> std::string { return (s.substr(0, s.size() - which.size())); }
+
+/// @brief Trim from the start (in place)
+inline void string_ltrim(std::string &s)
+{
+	if (s.length() == 0)
+		return;
+
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+}
+
+/// @brief Trim from the end (in place)
+inline void string_rtrim(std::string &s)
+{
+	if (s.length() == 0)
+		return;
+
+	s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end());
+}
+
+/// @brief Trim from both ends (in place)
+inline void string_trim(std::string &s)
+{
+	string_rtrim(s);
+	string_ltrim(s);
 }
 
 #endif // H_STR_UTILS

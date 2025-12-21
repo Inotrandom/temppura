@@ -3,6 +3,10 @@
 
 #include <string>
 #include <vector>
+#include <map>
+
+#include "flag.h"
+#include "configuration.h"
 
 #include "lexicon.h"
 #include "tokenizer.h"
@@ -20,6 +24,8 @@ public:
 
 	auto compile(std::string script) -> std::string;
 
+	void load_config();
+
 	void build_project(std::string parent_dir);
 
 	void err(const std::string what, std::uint64_t line_n = 0)
@@ -32,12 +38,13 @@ public:
 			std::cout << "Traceback to line " << line_n << std::endl;
 		}
 
-		m_running = false;
+		abort();
 	}
 
-	void handle_token(std::vector<std::string> &tokens, TOKEN id, std::string &res, std::uint64_t line_n);
+	void handle_token(std::vector<std::string> &tokens, TOKEN id, std::uint64_t line_n);
 
-	void func_define(std::vector<std::string> tokens, std::string &res, std::uint64_t line_n);
+	void func_define(std::vector<std::string> tokens, std::uint64_t line_n);
+	void func_flag(std::vector<std::string> tokens, std::uint64_t line_n);
 
 	void sort_aliases_length();
 
@@ -45,14 +52,19 @@ public:
 
 	void clear_cache() { m_aliases.clear(); }
 
+	auto has_flag(FLAG_TYPE flag) -> bool { return (m_flags.find(flag) != m_flags.end()); }
+
 private:
 	void compile_project();
 
 	void clean_project();
 
-	bool m_running;
+	bool m_running = true;
 
 	std::vector<alias_t> m_aliases;
+	std::map<FLAG_TYPE, std::string> m_flags;
+
+	configuration_t m_config;
 };
 
-#endif
+#endif // H_COMPILER

@@ -16,7 +16,7 @@ static void console_clear()
 #endif
 }
 
-auto main(int argv, char **argc) -> int
+auto main() -> int
 {
 	bool m_running = true;
 
@@ -26,7 +26,8 @@ auto main(int argv, char **argc) -> int
 
 	while (m_running)
 	{
-		std::cout << std::filesystem::current_path() << " dp-helper >";
+		std::string path = std::string(std::filesystem::current_path());
+		std::cout << path << " dp-helper >";
 
 		std::string buf;
 		std::getline(std::cin, buf);

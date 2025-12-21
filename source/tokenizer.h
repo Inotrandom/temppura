@@ -3,18 +3,23 @@
 
 #include <map>
 #include <string>
+#include <cstdint>
 
 #include "lexicon.h"
 
-enum TOKEN
+enum class TOKEN : uint8_t
 {
 	NONEXISTENT,
-	DEFINE
+	DEFINE,
+	FLAG
 };
 
+// clang-format off
 const std::map<std::string, TOKEN> tokenizer = {
-	{"define", TOKEN::DEFINE},
+	{LEXICON::DEFINE, TOKEN::DEFINE},
+    {LEXICON::FLAG, TOKEN::FLAG}
 };
+// clang-format on
 
 inline auto tokenize(const std::string what) -> TOKEN
 {
@@ -32,4 +37,4 @@ inline auto tokenize(const std::string what) -> TOKEN
 	return res;
 }
 
-#endif
+#endif // H_TOKENIZER
