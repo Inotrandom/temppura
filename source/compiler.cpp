@@ -242,6 +242,8 @@ void compiler_t::build_project(std::string parent_dir)
 {
 	auto start = std::chrono::high_resolution_clock::now();
 
+	m_running = true; // Haven't aborted yet.
+
 	if (std::filesystem::exists(parent_dir) == false)
 	{
 		err("Project does not exist!");
