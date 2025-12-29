@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <cstdint>
+#include <stdexcept>
 
 #include "lexicon.h"
 

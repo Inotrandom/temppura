@@ -289,9 +289,21 @@ void compiler_t::build_project(std::string parent_dir)
 	std::cout << "[info] Build completed in " << MILLI_TO_U * s.count() << " seconds." << std::endl;
 }
 
+inline auto sort_dir_entry(std::filesystem::directory_entry &a, std::filesystem::directory_entry &b) { return a.path().string() < b.path().string(); }
+
 void compiler_t::compile_project()
 {
+	std::vector<std::filesystem::directory_entry> dirs;
+
+	// Collect entries
 	for (const auto &dir_entry : std::filesystem::recursive_directory_iterator(DIR::SOURCE))
+	{
+		dirs.push_back(dir_entry);
+	}
+
+	std::sort(dirs.begin(), dirs.end(), sort_dir_entry);
+
+	for (const auto &dir_entry : dirs)
 	{
 		std::stringstream stream_name;
 		stream_name << dir_entry;

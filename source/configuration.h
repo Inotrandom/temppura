@@ -2,6 +2,7 @@
 #define H_CONFIGURATION
 
 #include <string>
+#include <cstdint>
 
 #include "strutils.h"
 

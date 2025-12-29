@@ -8,7 +8,6 @@
 #include "flag.h"
 #include "configuration.h"
 
-#include "lexicon.h"
 #include "tokenizer.h"
 
 #include "alias.h"
@@ -50,7 +49,11 @@ public:
 
 	void fill_aliases(std::string &res);
 
-	void clear_cache() { m_aliases.clear(); }
+	void clear_cache()
+	{
+		m_aliases.clear();
+		m_flags.clear();
+	}
 
 	auto has_flag(FLAG_TYPE flag) -> bool { return (m_flags.find(flag) != m_flags.end()); }
 
