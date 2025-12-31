@@ -58,7 +58,7 @@ public:
 	auto has_flag(FLAG_TYPE flag) -> bool { return (m_flags.find(flag) != m_flags.end()); }
 
 private:
-	void compile_project();
+	auto compile_project() -> std::uint64_t;
 
 	void clean_project();
 

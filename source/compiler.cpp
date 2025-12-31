@@ -274,7 +274,7 @@ void compiler_t::build_project(std::string parent_dir)
 
 	std::filesystem::copy(DIR::SOURCE, "./build", std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
 
-	compile_project();
+	std::uint64_t files_compiled = compile_project();
 
 	if (m_running == false)
 		return;
@@ -286,14 +286,16 @@ void compiler_t::build_project(std::string parent_dir)
 
 	std::cout << std::endl;
 
+	std::cout << "[info] " << files_compiled << " files compiled successfully." << std::endl;
 	std::cout << "[info] Build completed in " << MILLI_TO_U * s.count() << " seconds." << std::endl;
 }
 
 inline auto sort_dir_entry(std::filesystem::directory_entry &a, std::filesystem::directory_entry &b) { return a.path().string() < b.path().string(); }
 
-void compiler_t::compile_project()
+auto compiler_t::compile_project() -> std::uint64_t
 {
 	std::vector<std::filesystem::directory_entry> dirs;
+	std::uint64_t res = 0;
 
 	// Collect entries
 	for (const auto &dir_entry : std::filesystem::recursive_directory_iterator(DIR::SOURCE))
@@ -330,6 +332,7 @@ void compiler_t::compile_project()
 			continue;
 
 		std::string compiled = compile(file_read(trimmed_name).value());
+		++res;
 
 		// Output file extension
 		std::string output_fextension = m_config.default_fextension;
@@ -359,6 +362,8 @@ void compiler_t::compile_project()
 
 		m_flags.clear();
 	}
+
+	return res;
 }
 
 void compiler_t::clean_project()
