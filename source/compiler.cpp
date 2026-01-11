@@ -12,6 +12,7 @@
 
 #include "compiler.h"
 
+#include "alias.h"
 #include "configuration.h"
 #include "strutils.h"
 #include "fileutils.h"
@@ -144,7 +145,7 @@ auto compiler_t::compile(std::string script) -> std::string
 		handle_token(tokens, tokenized_id, line_n);
 	}
 
-	fill_aliases(res);
+	evaluate_aliases(res);
 
 	const auto now = std::chrono::system_clock::now();
 	const std::time_t t_c = std::chrono::system_clock::to_time_t(now);
@@ -263,7 +264,7 @@ auto is_alias_k_greator(const alias_t &a, const alias_t &b) -> bool { return (a.
 
 void compiler_t::sort_aliases_length() { std::sort(m_aliases.begin(), m_aliases.end(), is_alias_k_greator); }
 
-void compiler_t::fill_aliases(std::string &res)
+void compiler_t::evaluate_aliases(std::string &res)
 {
 	if (m_aliases.size() == 0)
 		return;
@@ -296,6 +297,8 @@ void compiler_t::build_project(std::string parent_dir)
 
 	std::uint64_t build_number = stoi(m_cache.build_number);
 	std::cout << "[info] Build #" << build_number + 1 << " of " << m_config.project_name << std::endl;
+
+	m_aliases.push_back(alias_t("_BN_", std::to_string(build_number)));
 
 	if (m_running == false)
 		return;

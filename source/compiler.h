@@ -51,7 +51,7 @@ public:
 
 	void sort_aliases_length();
 
-	void fill_aliases(std::string &res);
+	void evaluate_aliases(std::string &res);
 
 	void clear_mem_cache()
 	{
