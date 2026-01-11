@@ -298,7 +298,7 @@ void compiler_t::build_project(std::string parent_dir)
 	std::uint64_t build_number = stoi(m_cache.build_number);
 	std::cout << "[info] Build #" << build_number + 1 << " of " << m_config.project_name << std::endl;
 
-	m_aliases.push_back(alias_t("_BN_", std::to_string(build_number)));
+	m_aliases.push_back(alias_t("_BN_", std::to_string(build_number + 1)));
 
 	if (m_running == false)
 		return;
