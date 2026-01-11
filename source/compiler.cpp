@@ -12,13 +12,15 @@
 
 #include "compiler.h"
 
+#include "configuration.h"
 #include "strutils.h"
 #include "fileutils.h"
 #include "utils.h"
 
-const std::string SIGNATURE = "$COMMENT File compiled on $T $ENDCOMMENT\n\n$COMMENT Temppura: https://github.com/Inotrandom/temppura $ENDCOMMENT \n$COMMENT "
-							  "12/20/2025 (MIT License) $ENDCOMMENT\n\n$COMMENT THIS FILE IS NOT INTENDED FOR HUMAN MODIFICATION! $ENDCOMMENT\n$COMMENT (it's "
-							  "just less readable...) $ENDCOMMENT\n\n";
+const std::string SIGNATURE =
+	"$COMMENT File compiled on $T, build No. $N $ENDCOMMENT\n\n$COMMENT Temppura: https://github.com/Inotrandom/temppura $ENDCOMMENT \n$COMMENT "
+	"12/20/2025 (MIT License) $ENDCOMMENT\n\n$COMMENT THIS FILE IS NOT INTENDED FOR HUMAN MODIFICATION! $ENDCOMMENT\n$COMMENT (it's "
+	"just less readable...) $ENDCOMMENT\n\n";
 
 // clang-format off
 #define FORCE_CONFIG(TEST, VAL) if (m_config.TEST == DEFAULT_STRING_VALUE) { std::stringstream msg; msg << "Configuration failed! " << VAL << " is undefined!"; err(msg.str()); return; }
@@ -48,8 +50,42 @@ void compiler_t::load_config()
 	FORCE_CONFIG(end_comment, CONFIG_LEXICON::END_COMMENT)
 	m_config.end_comment = trim_first_and_last(m_config.end_comment);
 
+	m_config.project_name = get_pair(opened_contents, CONFIG_LEXICON::PROJECT_NAME);
+	FORCE_CONFIG(project_name, CONFIG_LEXICON::PROJECT_NAME)
+	m_config.project_name = trim_first_and_last(m_config.project_name);
+
 	m_config.default_fextension = get_pair(opened_contents, CONFIG_LEXICON::DEFAULT_FEXTENSION);
 	m_config.default_fextension = trim_first_and_last(m_config.default_fextension);
+}
+
+void compiler_t::load_cache()
+{
+	std::stringstream path;
+	path << "./" << FILE_NAME::CACHE;
+	std::optional<std::string> contents = file_read(path.str());
+
+	if (contents.has_value() == false)
+	{
+		gen_cache();
+		std::cout << "[info] Cache generated" << std::endl;
+		return;
+	}
+
+	std::string opened_contents = contents.value();
+
+	m_cache.build_number = get_pair(opened_contents, CACHE_LEXICON::BUILD_NUMBER);
+}
+
+void compiler_t::gen_cache()
+{
+	std::stringstream path;
+	path << "./" << FILE_NAME::CACHE;
+
+	std::stringstream contents;
+
+	contents << produce_pair(CACHE_LEXICON::BUILD_NUMBER, m_cache.build_number);
+
+	file_write(path.str(), contents.str());
 }
 
 auto compiler_t::compile(std::string script) -> std::string
@@ -122,6 +158,8 @@ auto compiler_t::compile(std::string script) -> std::string
 	string_replace(signature, "$T", time_and_zone);
 	string_replace(signature, "$ENDCOMMENT", m_config.end_comment);
 	string_replace(signature, "$COMMENT", m_config.begin_comment);
+
+	string_replace(signature, "$N", m_cache.build_number);
 
 	res = signature + res;
 
@@ -254,6 +292,10 @@ void compiler_t::build_project(std::string parent_dir)
 
 	std::cout << "[info] Operating in: " << std::filesystem::current_path() << std::endl << std::endl;
 	load_config();
+	load_cache();
+
+	std::uint64_t build_number = stoi(m_cache.build_number);
+	std::cout << "[info] Build #" << build_number + 1 << " of " << m_config.project_name << std::endl;
 
 	if (m_running == false)
 		return;
@@ -286,8 +328,13 @@ void compiler_t::build_project(std::string parent_dir)
 
 	std::cout << std::endl;
 
+	build_number++;
+	m_cache.build_number = std::to_string(build_number);
+
 	std::cout << "[info] " << files_compiled << " files compiled successfully." << std::endl;
-	std::cout << "[info] Build completed in " << MILLI_TO_U * s.count() << " seconds." << std::endl;
+	std::cout << "[info] Build #" << build_number << " completed in " << MILLI_TO_U * s.count() << " seconds." << std::endl;
+
+	gen_cache(); // Regenerate the cache.
 }
 
 inline auto sort_dir_entry(std::filesystem::directory_entry &a, std::filesystem::directory_entry &b) { return a.path().string() < b.path().string(); }

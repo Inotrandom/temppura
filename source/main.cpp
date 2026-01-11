@@ -57,7 +57,7 @@ auto main() -> int
 			continue;
 		}
 
-		compiler.clear_cache();
+		compiler.clear_mem_cache();
 		compiler.build_project(buf);
 	}
 

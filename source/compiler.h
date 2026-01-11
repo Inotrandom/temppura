@@ -25,6 +25,10 @@ public:
 
 	void load_config();
 
+	void load_cache();
+
+	void gen_cache();
+
 	void build_project(std::string parent_dir);
 
 	void err(const std::string what, std::uint64_t line_n = 0)
@@ -49,7 +53,7 @@ public:
 
 	void fill_aliases(std::string &res);
 
-	void clear_cache()
+	void clear_mem_cache()
 	{
 		m_aliases.clear();
 		m_flags.clear();
@@ -68,6 +72,8 @@ private:
 	std::map<FLAG_TYPE, std::string> m_flags;
 
 	configuration_t m_config;
+
+	cache_t m_cache;
 };
 
 #endif // H_COMPILER

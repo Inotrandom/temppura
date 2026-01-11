@@ -3,6 +3,8 @@
 
 #define MILLI_TO_U 1.0 / 1000.0
 
+#include <string>
+
 inline auto ddelim() -> std::string
 {
 #if defined _WIN32

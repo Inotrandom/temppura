@@ -25,6 +25,8 @@ inline auto file_read(const std::string &path) -> std::optional<std::string>
 	std::stringstream buf;
 	buf << file.rdbuf();
 
+	file.close();
+
 	return buf.str();
 }
 
@@ -36,6 +38,8 @@ inline auto file_write(const std::string &path, const std::string &contents) -> 
 		return 1;
 
 	file << contents;
+
+	file.close();
 
 	return 0;
 }

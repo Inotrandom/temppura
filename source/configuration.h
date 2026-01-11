@@ -3,8 +3,19 @@
 
 #include <string>
 #include <cstdint>
+#include <sstream>
 
 #include "strutils.h"
+
+struct cache_t
+{
+	std::string build_number = "0";
+};
+
+namespace CACHE_LEXICON
+{
+const std::string BUILD_NUMBER = "_BN";
+}
 
 struct configuration_t
 {
@@ -12,6 +23,7 @@ struct configuration_t
 	std::string end_comment;
 
 	std::string default_fextension;
+	std::string project_name;
 };
 
 namespace CONFIG_LEXICON
@@ -22,6 +34,7 @@ const std::string KP_DELIM = "=";
 const std::string BEGIN_COMMENT = "BEGIN_COMMENT";
 const std::string END_COMMENT = "END_COMMENT";
 const std::string DEFAULT_FEXTENSION = "DEFAULT_FILE_EXTENSION";
+const std::string PROJECT_NAME = "PROJECT_NAME";
 } // namespace CONFIG_LEXICON
 
 const std::uint8_t KP_SIZE = 2;
@@ -49,5 +62,12 @@ inline auto get_pair(const std::string &contents, const std::string k) -> std::s
 
 	return DEFAULT_STRING_VALUE;
 }
+
+inline auto produce_pair(const std::string k, const std::string p) -> std::string
+{
+	std::stringstream res;
+	res << k << CONFIG_LEXICON::KP_DELIM << p << CONFIG_LEXICON::STATEMENT_DELIM;
+	return res.str();
+};
 
 #endif // H_CONFIGURATION

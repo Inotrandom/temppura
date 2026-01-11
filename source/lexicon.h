@@ -25,6 +25,7 @@ namespace FILE_NAME
 {
 const std::string EXTENSION = ".ppura";
 const std::string CONFIG = "temppura.cfg";
+const std::string CACHE = ".temppura-cache.cfg";
 } // namespace FILE_NAME
 
 #endif // H_LEXICON
